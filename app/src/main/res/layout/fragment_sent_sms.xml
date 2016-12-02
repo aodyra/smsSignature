@@ -39,24 +39,47 @@
 
         </ScrollView>
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <EditText
+            android:id="@+id/keyEncypt"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center">
+            android:hint="key for enrypt"/>
 
-            <Button
-                android:id="@+id/buttonEncrypt"
-                android:layout_width="wrap_content"
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="encrypt" />
+                android:layout_gravity="center">
 
-            <Button
-                android:id="@+id/buttonSendSms"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="send"/>
+                <ToggleButton
+                    android:id="@+id/encryptMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textOff="encrypt"
+                    android:textOn="encrypt on"/>
+                <ToggleButton
+                    android:id="@+id/signatureMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textOff="signature"
+                    android:textOn="signature on" />
+                <Button
+                    android:id="@+id/processSms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="process" />
+                <Button
+                    android:id="@+id/buttonSendSms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="send"/>
 
-        </LinearLayout>
+            </LinearLayout>
+        </HorizontalScrollView>
+
 
     </LinearLayout>
 

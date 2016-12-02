@@ -54,12 +54,36 @@
 
         </ScrollView>
 
-        <Button
-            android:id="@+id/buttonDecrypt"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/keyDecrypt"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="decrypt" />
+            android:hint="key for decrypt"/>
+        <EditText
+            android:id="@+id/publicKeyDecrypt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="public key for verify"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/buttonDecrypt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="decrypt" />
+            <Button
+                android:id="@+id/verifiedSms"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="VERIFY" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

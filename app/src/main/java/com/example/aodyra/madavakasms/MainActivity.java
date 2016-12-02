@@ -22,6 +22,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.SmsManager;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,13 +34,24 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
+import org.w3c.dom.Text;
+
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 public class MainActivity extends AppCompatActivity {
     public static final String ARG_MENU_NUMBER = "MENU_NUMBER";
+    public static BigInteger privateKey = null;
     private String[] mNavItems;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -86,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         if (savedInstanceState == null) {
-            selectItem(0);
+            selectItem(2);
         }
     }
 
@@ -125,8 +137,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void wewe(){
-
+    public void setPrivateKey(BigInteger _privateKey){
+        privateKey = _privateKey;
     }
 
     public void selectItem(int position){
@@ -226,9 +238,17 @@ public class MainActivity extends AppCompatActivity {
 
         private String textPhoneNumber;
         private String textMessage;
-        private String textEncryptedMessage;
+        private String textEncryptedMessage = "";
         private EditText phoneNumber;
         private EditText message;
+        private EditText keyEncrypt;
+        private TextView inputEncryptedMessage;
+        private Button processSms;
+        private Button buttonSendSms;
+        private ToggleButton encryptMessage;
+        private ToggleButton signatureMessage;
+
+        private String textKeyEncrypt;
 
         public SentSmsFragment() {
 
@@ -237,14 +257,66 @@ public class MainActivity extends AppCompatActivity {
         @Nullable
         @Override
         public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
-            int i = getArguments().getInt(ARG_MENU_NUMBER);
+            final int i = getArguments().getInt(ARG_MENU_NUMBER);
             String menu = getResources().getStringArray(R.array.nav_items)[i];
             View rootView = inflater.inflate(R.layout.fragment_sent_sms, container, false);
             Button sendButton = (Button) rootView.findViewById(R.id.buttonSendSms);
+            keyEncrypt = (EditText) rootView.findViewById(R.id.keyEncypt);
+            keyEncrypt.setEnabled(false);
             phoneNumber = (EditText) rootView.findViewById(R.id.input_phone_number);
             message = (EditText) rootView.findViewById(R.id.input_message);
-            textPhoneNumber = phoneNumber.getText().toString();
-            textMessage = phoneNumber.getText().toString();
+            inputEncryptedMessage = (TextView) rootView.findViewById(R.id.input_encrypt_message);
+            processSms = (Button) rootView.findViewById(R.id.processSms);
+            buttonSendSms = (Button) rootView.findViewById(R.id.buttonSendSms);
+            encryptMessage = (ToggleButton) rootView.findViewById(R.id.encryptMessage);
+            signatureMessage = (ToggleButton) rootView.findViewById(R.id.signatureMessage);
+            encryptMessage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (encryptMessage.isChecked()) keyEncrypt.setEnabled(true);
+                }
+            });
+            processSms.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    textPhoneNumber = phoneNumber.getText().toString();
+                    textMessage = message.getText().toString();
+                    textKeyEncrypt = keyEncrypt.getText().toString();
+                    String messagess = textMessage;
+                    if (MainActivity.privateKey != null) {
+                        if (encryptMessage.isChecked()) {
+                            try{
+                                IvParameterSpec iv = new IvParameterSpec("AVAVAVAVAVAVAVAV".getBytes());
+                                SecretKeySpec secretKeySpec = new SecretKeySpec(Arrays.copyOf(new SHA1(textKeyEncrypt).getHash().getBytes(), 16), "AES");
+                                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+                                cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, iv);
+                                byte[] encrypted = cipher.doFinal(textMessage.getBytes());
+                                messagess = Base64.encodeToString(encrypted, Base64.DEFAULT);
+                            } catch (Exception x){
+                                Toast.makeText(container.getContext(), x.getMessage(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                            Toast.makeText(container.getContext(), "Message has been encrypted",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        if (signatureMessage.isChecked()) {
+                            ECDSA ecdsa = new ECDSA();
+                            Pair<BigInteger, BigInteger> sign = ecdsa.sign(messagess, MainActivity.privateKey);
+                            textEncryptedMessage += messagess;
+                            textEncryptedMessage += "<ds>" + sign.toString() + "</ds>";
+                            inputEncryptedMessage.setText(textEncryptedMessage);
+                            Toast.makeText(container.getContext(), "Message has been signed",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+
+                        }
+                    } else {
+                        Toast.makeText(container.getContext(), "You must generate private and public key",
+                                Toast.LENGTH_SHORT).show();
+                        ((MainActivity)getActivity()).selectItem(2);
+                    }
+                }
+            });
             sendButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -271,16 +343,55 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static class GenerateKeyFragment extends Fragment{
+
+        private EditText privateKey;
+        private EditText publicKey;
+        private Button generatePublicKey;
+        private Button generateTwoKey;
+
         public GenerateKeyFragment() {
 
         }
 
         @Nullable
         @Override
-        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
             int i = getArguments().getInt(ARG_MENU_NUMBER);
             String menu = getResources().getStringArray(R.array.nav_items)[i];
             View rootView = inflater.inflate(R.layout.generate_key, container, false);
+            privateKey = (EditText) rootView.findViewById(R.id.private_key);
+            publicKey = (EditText) rootView.findViewById(R.id.public_key);
+            generatePublicKey = (Button) rootView.findViewById(R.id.button_generate_public_key);
+            generateTwoKey = (Button) rootView.findViewById(R.id.button_generate_two_key);
+            generatePublicKey.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String stringPrivateKey = privateKey.getText().toString();
+                    if(!stringPrivateKey.equals("")){
+                        ECDSA ecdsa = new ECDSA();
+                        Point key = ecdsa.generate(new BigInteger(stringPrivateKey));
+                        publicKey.setText(key.toString());
+                        ((MainActivity)getActivity()).setPrivateKey(new BigInteger(stringPrivateKey));
+                        Toast.makeText(container.getContext(), "Public key generate",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(container.getContext(), "Private key must not empty",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            generateTwoKey.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ECDSA ecdsa = new ECDSA();
+                    Pair<BigInteger, Point> key = ecdsa.generateKey();
+                    publicKey.setText(key.right.toString());
+                    privateKey.setText(key.left.toString());
+                    ((MainActivity)getActivity()).setPrivateKey(key.left);
+                    Toast.makeText(container.getContext(), "Private and public key generate",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
             getActivity().setTitle(menu);
             return rootView;
         }

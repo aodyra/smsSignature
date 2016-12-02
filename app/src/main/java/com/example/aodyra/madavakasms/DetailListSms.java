@@ -15,7 +15,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -96,12 +100,24 @@ public class DetailListSms extends AppCompatActivity{
 
         public static final String ARG_OBJECT_SMS = "object_sms";
 
+        private TextView decryptDetailMessage;
+        private Button buttonDecrypt;
+        private Button verifiedSms;
+        private EditText keyDecrypt;
+        private EditText publicKeyDecrypt;
+
+
         @Nullable
         @Override
         public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                                  @Nullable Bundle savedInstanceState) {
             Sms sms = getArguments().getParcelable(ARG_OBJECT_SMS);
             View rootView = inflater.inflate(R.layout.fragment_detail_sms, container, false);
+            decryptDetailMessage = (TextView) rootView.findViewById(R.id.decrypt_detail_message);
+            buttonDecrypt = (Button) rootView.findViewById(R.id.buttonDecrypt);
+            verifiedSms = (Button) rootView.findViewById(R.id.verifiedSms);
+            keyDecrypt = (EditText) rootView.findViewById(R.id.keyEncypt);
+            publicKeyDecrypt = (EditText) rootView.findViewById(R.id.publicKeyDecrypt);
             ((TextView) rootView.findViewById(R.id.detail_phone_number)).setText(sms.getPhonenumber());
             ((TextView) rootView.findViewById(R.id.detail_message)).setText(sms.getMessage());
             return rootView;
