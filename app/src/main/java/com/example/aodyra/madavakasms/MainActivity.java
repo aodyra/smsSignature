@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                     textPhoneNumber = phoneNumber.getText().toString();
                     textMessage = message.getText().toString();
                     textKeyEncrypt = keyEncrypt.getText().toString();
-                    String messagess = textMessage;
+                    textEncryptedMessage = textMessage;
                     if (MainActivity.privateKey != null) {
                         if (encryptMessage.isChecked()) {
                             try{
@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
                                 Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
                                 cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, iv);
                                 byte[] encrypted = cipher.doFinal(textMessage.getBytes());
-                                messagess = Base64.encodeToString(encrypted, Base64.DEFAULT);
+                                textEncryptedMessage = Base64.encodeToString(encrypted, Base64.DEFAULT);
                             } catch (Exception x){
                                 Toast.makeText(container.getContext(), x.getMessage(),
                                         Toast.LENGTH_SHORT).show();
@@ -301,14 +301,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                         if (signatureMessage.isChecked()) {
                             ECDSA ecdsa = new ECDSA();
-                            Pair<BigInteger, BigInteger> sign = ecdsa.sign(messagess, MainActivity.privateKey);
-                            textEncryptedMessage += messagess;
+                            Pair<BigInteger, BigInteger> sign = ecdsa.sign(textEncryptedMessage, MainActivity.privateKey);
+                            textEncryptedMessage += textEncryptedMessage;
                             textEncryptedMessage += "<ds>" + sign.toString() + "</ds>";
-                            inputEncryptedMessage.setText(textEncryptedMessage);
                             Toast.makeText(container.getContext(), "Message has been signed",
                                     Toast.LENGTH_SHORT).show();
-                        } else {
-
+                        }
+                        if (encryptMessage.isChecked() || signatureMessage.isChecked()){
+                            inputEncryptedMessage.setText(textEncryptedMessage);
                         }
                     } else {
                         Toast.makeText(container.getContext(), "You must generate private and public key",
