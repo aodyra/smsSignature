@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
         private EditText phoneNumber;
         private EditText message;
         private EditText keyEncrypt;
-        private TextView inputEncryptedMessage;
+        private EditText inputEncryptedMessage;
         private Button processSms;
         private Button buttonSendSms;
         private ToggleButton encryptMessage;
@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
             keyEncrypt.setEnabled(false);
             phoneNumber = (EditText) rootView.findViewById(R.id.input_phone_number);
             message = (EditText) rootView.findViewById(R.id.input_message);
-            inputEncryptedMessage = (TextView) rootView.findViewById(R.id.input_encrypt_message);
+            inputEncryptedMessage = (EditText) rootView.findViewById(R.id.input_encrypt_message);
             processSms = (Button) rootView.findViewById(R.id.processSms);
             buttonSendSms = (Button) rootView.findViewById(R.id.buttonSendSms);
             encryptMessage = (ToggleButton) rootView.findViewById(R.id.encryptMessage);

@@ -11,6 +11,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,10 +19,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by aodyra on 12/1/16.
@@ -109,9 +115,9 @@ public class DetailListSms extends AppCompatActivity{
 
         @Nullable
         @Override
-        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+        public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container,
                                  @Nullable Bundle savedInstanceState) {
-            Sms sms = getArguments().getParcelable(ARG_OBJECT_SMS);
+            final Sms sms = getArguments().getParcelable(ARG_OBJECT_SMS);
             View rootView = inflater.inflate(R.layout.fragment_detail_sms, container, false);
             decryptDetailMessage = (TextView) rootView.findViewById(R.id.decrypt_detail_message);
             buttonDecrypt = (Button) rootView.findViewById(R.id.buttonDecrypt);
@@ -120,6 +126,50 @@ public class DetailListSms extends AppCompatActivity{
             publicKeyDecrypt = (EditText) rootView.findViewById(R.id.publicKeyDecrypt);
             ((TextView) rootView.findViewById(R.id.detail_phone_number)).setText(sms.getPhonenumber());
             ((TextView) rootView.findViewById(R.id.detail_message)).setText(sms.getMessage());
+
+            verifiedSms.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String publicKeyStr = publicKeyDecrypt.getText().toString();
+                    Pattern pattern = Pattern.compile("\\d+");
+                    Matcher matcher = pattern.matcher(publicKeyStr);
+                    List<BigInteger> publicKeyInt= new ArrayList<>();
+                    while (matcher.find() && publicKeyInt.size() <= 3) {
+                        publicKeyInt.add(new BigInteger(matcher.group(0)));
+                    }
+                    if (publicKeyInt.size() != 2) {
+                        Toast.makeText(container.getContext(), "Invalid public key", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    Point publicKey = new Point(publicKeyInt.get(0), publicKeyInt.get(1));
+
+                    String smsText = sms.getMessage();
+                    pattern = Pattern.compile("<ds>(.+?)</ds>");
+                    matcher = pattern.matcher(smsText);
+                    if (!matcher.find()) {
+                        Toast.makeText(container.getContext(), "Digital signature not found", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    pattern = Pattern.compile("\\d+");
+                    matcher = pattern.matcher(matcher.group(0));
+                    List<BigInteger> sigInt = new ArrayList<>();
+                    while (matcher.find() && sigInt.size() <= 3) {
+                        sigInt.add(new BigInteger(matcher.group(0)));
+                    }
+                    if (sigInt.size() != 2) {
+                        Toast.makeText(container.getContext(), "Invalid digital signature", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    Pair<BigInteger, BigInteger> signature = new Pair<>(sigInt.get(0), sigInt.get(1));
+
+                    ECDSA ecdsa = new ECDSA();
+                    boolean verified = ecdsa.verify(smsText, signature, publicKey);
+
+                    Toast.makeText(container.getContext(), String.format("SMS is %sverified!", verified ? "" : "NOT "), Toast.LENGTH_LONG).show();
+                }
+            });
             return rootView;
         }
     }
