@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">madavakaSMS</string>
+    <string-array name="nav_items">
+        <item>Inbox SMS</item>
+        <item>Sent SMS</item>
+        <item>Generate Key</item>
+        <item>About</item>
+    </string-array>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+</resources>

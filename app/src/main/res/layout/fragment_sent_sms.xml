@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/input_phone_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="Phone Number"/>
+
+        <EditText
+            android:id="@+id/input_message"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:gravity="top"
+            android:hint="Message"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Result"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
+
+            <TextView
+                android:id="@+id/input_encrypt_message"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/buttonEncrypt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="encrypt" />
+
+            <Button
+                android:id="@+id/buttonSendSms"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="send"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
