@@ -58,7 +58,7 @@
             android:id="@+id/keyDecrypt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="key for decrypt"/>
+            android:hint="click button encrypt to insert key"/>
         <EditText
             android:id="@+id/publicKeyDecrypt"
             android:layout_width="match_parent"

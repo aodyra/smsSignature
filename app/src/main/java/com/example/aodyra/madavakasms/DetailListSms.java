@@ -11,6 +11,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -25,9 +26,14 @@ import org.w3c.dom.Text;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * Created by aodyra on 12/1/16.
@@ -107,10 +113,15 @@ public class DetailListSms extends AppCompatActivity{
         public static final String ARG_OBJECT_SMS = "object_sms";
 
         private TextView decryptDetailMessage;
+        private TextView detailMessage;
         private Button buttonDecrypt;
         private Button verifiedSms;
         private EditText keyDecrypt;
         private EditText publicKeyDecrypt;
+
+        private String textDetailMessage;
+        private String textKeyDecrypt;
+        private String textDecryptedMessage;
 
 
         @Nullable
@@ -120,12 +131,40 @@ public class DetailListSms extends AppCompatActivity{
             final Sms sms = getArguments().getParcelable(ARG_OBJECT_SMS);
             View rootView = inflater.inflate(R.layout.fragment_detail_sms, container, false);
             decryptDetailMessage = (TextView) rootView.findViewById(R.id.decrypt_detail_message);
+            detailMessage = (TextView) rootView.findViewById(R.id.detail_message);
             buttonDecrypt = (Button) rootView.findViewById(R.id.buttonDecrypt);
             verifiedSms = (Button) rootView.findViewById(R.id.verifiedSms);
-            keyDecrypt = (EditText) rootView.findViewById(R.id.keyEncypt);
+            keyDecrypt = (EditText) rootView.findViewById(R.id.keyDecrypt);
             publicKeyDecrypt = (EditText) rootView.findViewById(R.id.publicKeyDecrypt);
             ((TextView) rootView.findViewById(R.id.detail_phone_number)).setText(sms.getPhonenumber());
             ((TextView) rootView.findViewById(R.id.detail_message)).setText(sms.getMessage());
+
+            buttonDecrypt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    textDetailMessage = detailMessage.getText().toString();
+                    int positionLastMessage = textDetailMessage.indexOf("\n<ds>");
+                    if(positionLastMessage != -1){
+                        textDetailMessage = textDetailMessage.substring(0, positionLastMessage);
+                    }
+                    textKeyDecrypt = keyDecrypt.getText().toString();
+                    if(!textKeyDecrypt.equals("")){
+                        try {
+                            IvParameterSpec iv = new IvParameterSpec("AVAVAVAVAVAVAVAV".getBytes());
+                            SecretKeySpec secretKeySpec = new SecretKeySpec(Arrays.copyOf(new SHA1(textKeyDecrypt).getHash().getBytes(), 16), "AES");
+                            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+                            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, iv);
+                            byte[] decrypted = cipher.doFinal(Base64.decode(textDetailMessage.getBytes(),Base64.NO_WRAP));
+                            textDecryptedMessage = new String(decrypted);
+                            Toast.makeText(container.getContext(), textDecryptedMessage, Toast.LENGTH_LONG).show();
+                        } catch (Exception x){
+                            Toast.makeText(container.getContext(), x.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(container.getContext(), "Key decrypt must not empty", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
 
             verifiedSms.setOnClickListener(new View.OnClickListener() {
                 @Override
