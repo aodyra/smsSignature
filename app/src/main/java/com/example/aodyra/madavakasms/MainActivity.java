@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
                                 Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
                                 cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, iv);
                                 byte[] encrypted = cipher.doFinal(textMessage.getBytes());
-                                textEncryptedMessage = Base64.encodeToString(encrypted, Base64.DEFAULT);
+                                textEncryptedMessage = Base64.encodeToString(encrypted, Base64.NO_WRAP);
                             } catch (Exception x){
                                 Toast.makeText(container.getContext(), x.getMessage(),
                                         Toast.LENGTH_SHORT).show();
@@ -302,12 +302,13 @@ public class MainActivity extends AppCompatActivity {
                         if (signatureMessage.isChecked()) {
                             ECDSA ecdsa = new ECDSA();
                             Pair<BigInteger, BigInteger> sign = ecdsa.sign(textEncryptedMessage, MainActivity.privateKey);
-                            textEncryptedMessage += textEncryptedMessage;
-                            textEncryptedMessage += "<ds>" + sign.toString() + "</ds>";
+                            textEncryptedMessage += "\n<ds>" + sign.toString() + "</ds>";
                             Toast.makeText(container.getContext(), "Message has been signed",
                                     Toast.LENGTH_SHORT).show();
                         }
                         if (encryptMessage.isChecked() || signatureMessage.isChecked()){
+                            Log.d("ENCRYPT", textEncryptedMessage);
+                            Log.d("ENCRYPT", MainActivity.privateKey.toString());
                             inputEncryptedMessage.setText(textEncryptedMessage);
                         }
                     } else {

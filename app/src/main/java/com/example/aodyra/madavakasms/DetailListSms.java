@@ -144,13 +144,14 @@ public class DetailListSms extends AppCompatActivity{
                     Point publicKey = new Point(publicKeyInt.get(0), publicKeyInt.get(1));
 
                     String smsText = sms.getMessage();
-                    pattern = Pattern.compile("<ds>(.+?)</ds>");
+                    pattern = Pattern.compile("\n<ds>(.+?)</ds>");
                     matcher = pattern.matcher(smsText);
                     if (!matcher.find()) {
                         Toast.makeText(container.getContext(), "Digital signature not found", Toast.LENGTH_LONG).show();
                         return;
                     }
-
+                    smsText = smsText.replace(matcher.group(0), "");
+                    Log.d("ENCRYPT", smsText);
                     pattern = Pattern.compile("\\d+");
                     matcher = pattern.matcher(matcher.group(0));
                     List<BigInteger> sigInt = new ArrayList<>();
