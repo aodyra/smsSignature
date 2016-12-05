@@ -1,6 +1,7 @@
 package com.example.aodyra.madavakasms;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 prepareSmsList();
                 args.putParcelableArrayList(InboxSmsFragment.ARG_LIST_SMS, (ArrayList<Sms>)smsList);
                 break;
-            case "sent sms":
+            case "send sms":
                 fragment = new SentSmsFragment();
                 break;
             case "generate key":
@@ -287,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
                     buttonSendSms.setEnabled(true);
                     textKeyEncrypt = keyEncrypt.getText().toString();
                     textEncryptedMessage = textMessage;
-                    if (MainActivity.privateKey != null) {
+                    if (MainActivity.privateKey != null || !signatureMessage.isChecked()) {
                         if (encryptMessage.isChecked()) {
                             try{
                                 IvParameterSpec iv = new IvParameterSpec("AVAVAVAVAVAVAVAV".getBytes());
@@ -340,7 +341,12 @@ public class MainActivity extends AppCompatActivity {
 
         protected void sendSms(){
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(textPhoneNumber,null,textEncryptedMessage,null,null);
+            PendingIntent sentPI = PendingIntent.getBroadcast(this.getContext(), 0, new Intent("SMS_SENT"), 0);
+//            PendingIntent deliveredPI = PendingIntent.getBroadcast(this.getContext(), 0, new Intent("SMS_DELIVERED"), 0);
+            ArrayList<String> parts = smsManager.divideMessage(textEncryptedMessage);
+            ArrayList<PendingIntent> sendList = new ArrayList<>();
+            sendList.add(sentPI);
+            smsManager.sendMultipartTextMessage(textPhoneNumber,null,parts,sendList,null);
             Log.i("jancuk1", textPhoneNumber);
             Log.i("jancuk2", textEncryptedMessage);
             Toast.makeText(this.getContext(), "SMS sent.", Toast.LENGTH_LONG).show();

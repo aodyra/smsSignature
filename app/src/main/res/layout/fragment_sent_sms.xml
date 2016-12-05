@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fadeScrollbars="false">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_margin="15dp">
 
         <EditText
             android:id="@+id/input_phone_number"
@@ -20,7 +22,10 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:gravity="top"
-            android:hint="Message"/>
+            android:hint="Message"
+            android:overScrollMode="always"
+            android:scrollbarStyle="insideInset"
+            android:scrollbars="vertical"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -28,22 +33,21 @@
             android:gravity="center_horizontal"
             android:text="Result"/>
 
-        <ScrollView
+
+        <EditText
+            android:id="@+id/input_encrypt_message"
             android:layout_width="match_parent"
-            android:layout_height="200dp">
-
-            <EditText
-                android:id="@+id/input_encrypt_message"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
-        </ScrollView>
+            android:layout_height="200dp"
+            android:overScrollMode="always"
+            android:scrollbarStyle="insideInset"
+            android:scrollbars="vertical"
+            android:editable="false"/>
 
         <EditText
             android:id="@+id/keyEncypt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="key for enrypt"/>
+            android:hint="click button encrypt to insert key"/>
 
         <HorizontalScrollView
             android:layout_width="match_parent"
@@ -59,13 +63,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textOff="encrypt"
-                    android:textOn="encrypt on"/>
+                    android:textOn="encrypt"/>
                 <ToggleButton
                     android:id="@+id/signatureMessage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textOff="signature"
-                    android:textOn="signature on" />
+                    android:textOn="signature" />
                 <Button
                     android:id="@+id/processSms"
                     android:layout_width="wrap_content"

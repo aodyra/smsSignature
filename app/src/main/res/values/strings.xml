@@ -2,7 +2,7 @@
     <string name="app_name">madavakaSMS</string>
     <string-array name="nav_items">
         <item>Inbox SMS</item>
-        <item>Sent SMS</item>
+        <item>Send SMS</item>
         <item>Generate Key</item>
         <item>About</item>
     </string-array>

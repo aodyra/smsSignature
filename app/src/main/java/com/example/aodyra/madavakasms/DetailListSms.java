@@ -156,7 +156,8 @@ public class DetailListSms extends AppCompatActivity{
                             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, iv);
                             byte[] decrypted = cipher.doFinal(Base64.decode(textDetailMessage.getBytes(),Base64.NO_WRAP));
                             textDecryptedMessage = new String(decrypted);
-                            Toast.makeText(container.getContext(), textDecryptedMessage, Toast.LENGTH_LONG).show();
+                            decryptDetailMessage.setText(textDecryptedMessage);
+                            Toast.makeText(container.getContext(), "Message decrypted", Toast.LENGTH_LONG).show();
                         } catch (Exception x){
                             Toast.makeText(container.getContext(), x.getMessage(), Toast.LENGTH_LONG).show();
                         }
